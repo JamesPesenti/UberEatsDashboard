@@ -1,0 +1,29 @@
+.ant-btn-primary {
+  color: white;
+  background-color: #3fc060 !important;
+  border-color: #3fc060 !important;
+}
+
+
+.ant-pagination-item-active {
+  color: white;
+  border-color: #3fc060 !important;
+}
+
+li.ant-pagination-item-active a {
+  color: #3fc060 !important;
+  border-color: white !important;
+}
+
+.ant-menu-item-selected {
+  background-color: #3fc060 !important;
+}
+
+.ant-menu-item-selected span {
+  color: white
+}
+
+/* .ant-menu-item-selected {
+ background-color: #3fc060 !important;
+} */
+

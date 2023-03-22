@@ -1,0 +1,71 @@
+import { useState } from "react"
+import { Form, Input, Card, Button, Message } from "antd"
+import GooglePlacesAutocomplete, { geocodeByAddress, getLatLng } from "react-google-places-autocomplete"
+
+import { DataStore } from "aws-amplify"
+import { Restaurant } from "../models/index"
+import { useRestaurantContext } from "./context/RestaurantContext"
+
+const Settings = () => {
+
+  const [name, setName] = useState("")
+  const [address, setAddress] = useState(null)
+  const [coordinates, setCoordinates] = useState(null)
+  
+  const {sub, setRestaurant} = useRestaurantContext()
+
+  const getAddressLatLng = async (address) => {
+    setAddress(address)
+    const geocodedByAddress = await geocodeByAddress(address.label)
+    const latLng = await getLatLng(geocodedByAddress[0]) 
+      setCoordinates(latLng)
+  }
+
+  const onSubmit = async () => {
+    const newRestaurant = await DataStore.save(new Restaurant({
+      name,
+      image: "https://t4.ftcdn.net/jpg/00/90/13/11/240_F_90131119_vgHaYWBxCQHzqZzTUk5uPRP4cJeHLO47.jpg",
+      deliveryFee: 0,
+      minDelieveryTime: 15,
+      maxDeliveryTime: 60,
+      address: address.label,
+      lat: coordinates.lat,
+      lng: coordinates.lng,
+      adminSub: sub,
+    })
+    )
+    setRestaurant(newRestaurant)
+  Message.success("Restaurant Created")
+  }
+
+  return (
+    <>
+      <Card title="Restaurant Details" style={{margin: 20}}>
+        <Form onFinish={onSubmit} layout="vertical" wrapperCol={{ span: 8 }}>
+            <Form.Item label="Restaurant Name" required>
+              <Input 
+              value={name} 
+              onChange={(e) => setName(e.target.value)} 
+              placeholder="Enter Restaurant Name"/>  
+            </Form.Item>
+            <Form.Item label="Restaurant Address" required>
+                <GooglePlacesAutocomplete
+                    apiKey="AIzaSyBZtJc8RiAQnnx6UmAZBogsAvbNqLGGxRI"
+                    selectedProps={{
+                        value: address,
+                        onChange: getAddressLatLng
+                    }}
+                />
+            </Form.Item>
+            <Form.Item >
+              <Button htmlType="submit" type="primary">Submit</Button>  
+            </Form.Item>
+        </Form>
+        <span>{coordinates?.lat} - {coordinates?.lng}</span>
+      </Card>
+    </>
+  )
+}
+
+export default Settings
+
